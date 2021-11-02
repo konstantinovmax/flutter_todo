@@ -19,14 +19,50 @@ class _HomeState extends State<Home> {
         .addAll(['Почистить зубы', 'Приготовить завтрак', 'Проверить почту']);
   }
 
+  void _menuOpen() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.blue[300],
+          title: const Text('Меню'),
+          centerTitle: true,
+        ),
+        body: Align(
+          alignment: Alignment.center,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Colors.green[300],
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/todo', (route) => false);
+            },
+            child: const Text(
+              'К списку',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        backgroundColor: Colors.green[300],
+        backgroundColor: Colors.blue[300],
         title: const Text('Список дел'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu_outlined),
+            onPressed: _menuOpen,
+          ),
+        ],
       ),
       body: ListView.builder(
           itemCount: todoList.length,
@@ -37,8 +73,7 @@ class _HomeState extends State<Home> {
                 child: ListTile(
                   title: Text(todoList[index]),
                   trailing: IconButton(
-                    icon:
-                        const Icon(Icons.delete_sweep, color: Colors.redAccent),
+                    icon: const Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () {
                       setState(() {
                         todoList.removeAt(index);
@@ -58,27 +93,52 @@ class _HomeState extends State<Home> {
           backgroundColor: Colors.green[300],
           onPressed: () {
             showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Добавить задачу'),
-                    content: TextField(
-                      onChanged: (String value) {
-                        _userTask = value;
-                      },
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text(
+                    'Добавить задачу',
+                    textAlign: TextAlign.center,
+                  ),
+                  content: TextField(
+                    onChanged: (String value) {
+                      _userTask = value;
+                    },
+                  ),
+                  actions: [
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.green[300],
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                todoList.add(_userTask);
+                              });
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Добавить'),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.red[300],
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Отменить'),
+                          ),
+                        ],
+                      ),
                     ),
-                    actions: [
-                      ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              todoList.add(_userTask);
-                            });
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Добавить')),
-                    ],
-                  );
-                });
+                  ],
+                );
+              },
+            );
           },
           child: const Icon(Icons.add, color: Colors.white)),
     );
